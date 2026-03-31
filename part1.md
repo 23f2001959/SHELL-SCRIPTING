@@ -536,3 +536,339 @@ after shift : $1=b $2=c
 | `>`        | Redirect output to file     |
 
 ---
+## Script 1 — `prg15.sh`: Using `shift` to walk through arguments
+
+### Code
+
+```bash
+#!/bin/bash
+i=1
+while [ -n "$1" ]
+do
+    echo "Argument $i = $1"
+    i=$((i+1))
+    shift
+done
+echo "Remaining arguments = $#"
+```
+
+### Explanation
+
+This script loops over all command-line arguments using the `shift` command.
+
+* `$1` always refers to the **current first argument**
+* `shift` removes the current first argument
+* `$2` becomes `$1`, `$3` becomes `$2`, and so on
+
+The condition:
+
+```bash
+while [ -n "$1" ]
+```
+
+checks whether `$1` is a non-empty string, so the loop continues until all arguments are consumed.
+
+`$#` stores the count of remaining arguments:
+
+* initially → total arguments given
+* finally → becomes 0 after all shifts
+
+### Key Points
+
+* `shift` is the standard way to iterate positional parameters
+* Without `shift`, `$1` would remain unchanged
+* `-n` checks for non-empty string
+* `(( i++ ))` or `$((i+1))` increments counter
+
+---
+
+## Script 2 — `prg16.sh`: PID and `exec bash`
+
+### Code
+
+```bash
+#!/bin/bash
+echo "PID before exec = $$"
+exec bash
+echo "This line will not execute"
+```
+
+### Explanation
+
+`$$` is a special variable that stores the PID (Process ID) of the current shell.
+
+`exec bash` replaces the current shell process with a new bash shell.
+
+Important:
+
+* no new child process is created
+* current process is overwritten
+
+Therefore code after `exec` never runs.
+
+### Key Points
+
+* `$$` gives current shell PID
+* `exec` replaces process image
+* lines after `exec` are dead code
+
+---
+
+## Script 3 — `execex.sh`: `exec` replaces the shell
+
+### Code
+
+```bash
+#!/bin/bash
+echo "Before exec"
+exec ls
+echo "After exec"
+```
+
+### Explanation
+
+This script demonstrates process replacement clearly.
+
+Execution flow:
+
+1. "Before exec" prints
+2. `exec ls` replaces current shell with `ls`
+3. directory listing appears
+4. "After exec" never executes
+
+### Key Points
+
+* `exec` consumes current shell process
+* following commands become unreachable
+
+---
+
+## Script 4 — `prg17.sh`: `eval` to execute a dynamic command
+
+### Code
+
+```bash
+#!/bin/bash
+cmd=date
+fmt=+%d-%B-%Y
+eval $cmd $fmt
+```
+
+### Explanation
+
+`eval` performs a second round of expansion and executes the result as a command.
+
+Here:
+
+* `$cmd` → `date`
+* `$fmt` → `+%d-%B-%Y`
+
+So effectively this becomes:
+
+```bash
+date +%d-%B-%Y
+```
+
+Another example:
+
+```bash
+a="echo Hello"
+eval $a
+```
+
+This executes:
+
+```bash
+echo Hello
+```
+
+### Key Points
+
+* `eval` helps build commands dynamically
+* performs two-pass evaluation
+* risky if user input is passed directly ⚠️
+
+---
+
+## Script 5 — `prg18.sh`: Functions with arguments
+
+### Code
+
+```bash
+#!/bin/bash
+
+usage()
+{
+    echo "Usage: $1 arg1 arg2"
+}
+
+swap()
+{
+    echo "$2 $1"
+}
+
+if [ $# -lt 2 ]
+then
+    usage $0
+    exit 1
+fi
+
+swap $1 $2
+```
+
+### Explanation
+
+Two functions are defined:
+
+### `usage()`
+
+Prints help message using `$1`
+
+### `swap()`
+
+Prints two arguments in reverse order
+
+The script first checks:
+
+```bash
+if [ $# -lt 2 ]
+```
+
+If fewer than 2 arguments are given:
+
+* usage message shown
+* script exits
+
+Otherwise:
+
+```bash
+swap $1 $2
+```
+
+is called.
+
+### Key Points
+
+* Inside function, `$1` and `$2` refer to function arguments
+* `$0` is script name
+* `exit 1` means abnormal termination
+
+---
+
+## Script 6 — `getoptex.sh`: Parsing flags using `getopts`
+
+### Code
+
+```bash
+#!/bin/bash
+
+while getopts "n:a:" opt
+do
+    case $opt in
+        n) echo "Name = $OPTARG" ;;
+        a) echo "Age = $OPTARG" ;;
+        ?) echo "Invalid option" ;;
+    esac
+done
+```
+
+### Explanation
+
+`getopts` parses short command-line options.
+
+Option string:
+
+```bash
+"n:a:"
+```
+
+means:
+
+* `-n` requires argument
+* `-a` requires argument
+
+If input is:
+
+```bash
+./script.sh -n Rahul -a 21
+```
+
+Then:
+
+* `$OPTARG` stores Rahul for `-n`
+* `$OPTARG` stores 21 for `-a`
+
+### Key Points
+
+* colon means argument required
+* `$OPTARG` stores value
+* `getopts` handles short options only
+
+---
+
+## Script 7 — `select` with `case` and `break`
+
+### Code
+
+```bash
+#!/bin/bash
+
+select i in apple mango grape
+do
+    case $i in
+        apple) echo "Apple selected" ;;
+        mango) echo "Mango selected" ;;
+        grape) echo "Grape selected"
+               break ;;
+    esac
+done
+
+echo "Last selected = $i"
+```
+
+### Explanation
+
+`select` automatically creates a numbered menu.
+
+Example menu:
+
+```bash
+1) apple
+2) mango
+3) grape
+```
+
+User enters a number.
+
+Selected item is stored in `$i`.
+
+`case` checks selected value.
+
+When grape is selected:
+
+```bash
+break
+```
+
+stops the loop.
+
+### Key Points
+
+* `select` creates interactive menu
+* loops continuously until `break`
+* `$i` stores selected text
+
+---
+
+## Overall Concepts Covered
+
+These scripts explain important Bash concepts:
+
+✅ `shift` → argument processing
+✅ `exec` → process replacement
+✅ `eval` → dynamic execution
+✅ functions
+✅ `getopts` → option parsing
+✅ `select` → menu handling
+
+---
