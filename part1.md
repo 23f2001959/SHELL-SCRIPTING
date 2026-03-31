@@ -872,3 +872,360 @@ These scripts explain important Bash concepts:
 ✅ `select` → menu handling
 
 ---
+
+# 🔥 1. Sum of Two Numbers
+
+```bash
+#!/bin/bash
+echo $(($1 + $2))
+```
+
+**Explanation:** Adds two command-line arguments.
+**Key Points:**
+
+* `$1`, `$2` → arguments
+* `$(( ))` → arithmetic
+
+---
+
+# 🔥 2. Check Number of Arguments
+
+```bash
+if [ $# -ne 2 ]
+then
+    echo "Error"
+fi
+```
+
+**Explanation:** Ensures exactly 2 inputs.
+**Key Points:**
+
+* `$#` → number of arguments
+
+---
+
+# 🔥 3. Largest of Three Numbers
+
+```bash
+a=$1; b=$2; c=$3
+
+if [ $a -ge $b ] && [ $a -ge $c ]
+then
+    echo $a
+elif [ $b -ge $c ]
+then
+    echo $b
+else
+    echo $c
+fi
+```
+
+**Key Points:**
+
+* Use `-ge` for ≥
+* Combine conditions with `&&`
+
+---
+
+# 🔥 4. Even or Odd
+
+```bash
+if (( $1 % 2 == 0 ))
+then
+    echo "Even"
+else
+    echo "Odd"
+fi
+```
+
+**Key Points:**
+
+* Use `(( ))` for arithmetic conditions
+
+---
+
+# 🔥 5. Factorial
+
+```bash
+n=$1
+fact=1
+
+for ((i=1; i<=n; i++))
+do
+    fact=$((fact * i))
+done
+
+echo $fact
+```
+
+**Key Points:**
+
+* Loop + multiplication
+
+---
+
+# 🔥 6. Fibonacci Series
+
+```bash
+a=0; b=1
+
+for ((i=0; i<$1; i++))
+do
+    echo $a
+    temp=$((a + b))
+    a=$b
+    b=$temp
+done
+```
+
+**Key Points:**
+
+* Use temporary variable
+
+---
+
+# 🔥 7. Prime Number Check
+
+```bash
+n=$1
+flag=0
+
+for ((i=2; i<=n/2; i++))
+do
+    if (( n % i == 0 ))
+    then
+        flag=1
+        break
+    fi
+done
+
+[ $flag -eq 0 ] && echo "Prime" || echo "Not Prime"
+```
+
+**Key Points:**
+
+* Use flag variable
+* `break` improves efficiency
+
+---
+
+# 🔥 8. Reverse a Number
+
+```bash
+n=$1
+rev=0
+
+while [ $n -gt 0 ]
+do
+    rem=$((n % 10))
+    rev=$((rev * 10 + rem))
+    n=$((n / 10))
+done
+
+echo $rev
+```
+
+**Key Points:**
+
+* Use `%` and `/`
+
+---
+
+# 🔥 9. Palindrome Check
+
+```bash
+num=$1
+rev=0
+temp=$num
+
+while [ $temp -gt 0 ]
+do
+    rem=$((temp % 10))
+    rev=$((rev * 10 + rem))
+    temp=$((temp / 10))
+done
+
+[ $num -eq $rev ] && echo "Palindrome" || echo "Not"
+```
+
+---
+
+# 🔥 10. Sum of All Arguments
+
+```bash
+sum=0
+
+for i in "$@"
+do
+    sum=$((sum + i))
+done
+
+echo $sum
+```
+
+**Key Points:**
+
+* `$@` → all arguments
+
+---
+
+# 🔥 11. Count Lines in File
+
+```bash
+count=0
+while read line
+do
+    count=$((count + 1))
+done < "$1"
+
+echo $count
+```
+
+**Key Points:**
+
+* `while read` for file
+
+---
+
+# 🔥 12. Check File Exists
+
+```bash
+if [ -f "$1" ]
+then
+    echo "File exists"
+fi
+```
+
+**Key Points:**
+
+* `-f` → regular file
+
+---
+
+# 🔥 13. Check File Permissions
+
+```bash
+if [ -r "$1" ] && [ -w "$1" ]
+then
+    echo "Readable & Writable"
+fi
+```
+
+**Key Points:**
+
+* `-r`, `-w`, `-x`
+
+---
+
+# 🔥 14. Copy All Files Using find
+
+```bash
+find source -type f -exec cp {} destination \;
+```
+
+**Key Points:**
+
+* `{}` → current file
+* `\;` → end
+
+---
+
+# 🔥 15. Print Only Even Numbers (1–N)
+
+```bash
+for ((i=1; i<=$1; i++))
+do
+    if (( i % 2 == 0 ))
+    then
+        echo $i
+    fi
+done
+```
+
+---
+
+# 🔥 16. Menu Driven Program (case)
+
+```bash
+case $1 in
+    add) echo $(($2 + $3)) ;;
+    sub) echo $(($2 - $3)) ;;
+    *) echo "Invalid" ;;
+esac
+```
+
+**Key Points:**
+
+* `case` replaces multiple `if`
+
+---
+
+# 🔥 17. Print SUCCESS or FAIL
+
+```bash
+./script.sh
+if [ $? -eq 0 ]
+then
+    echo "SUCCESS"
+else
+    echo "FAIL"
+fi
+```
+
+**Key Points:**
+
+* `$?` → exit status
+
+---
+
+# 🔥 18. String Length
+
+```bash
+str=$1
+echo ${#str}
+```
+
+**Key Points:**
+
+* `${#var}` → length
+
+---
+
+# 🔥 19. Substring
+
+```bash
+str="abcdef"
+echo ${str:1:3}
+```
+
+👉 Output: `bcd`
+
+---
+
+# 🔥 20. Redirect Output & Error
+
+```bash
+command > out.txt 2>&1
+```
+
+**Key Points:**
+
+* `>` → output
+* `2>` → error
+* `2>&1` → merge
+
+---
+
+# 🚀 FINAL REVISION CHEAT SHEET
+
+### MUST REMEMBER ⚠️
+
+* `$#`, `$1`, `$@`
+* `[ ]` → spacing matters
+* `(( ))` → arithmetic
+* `while read` → files
+* `$?` → exit status
+* `find ... -exec`
+
+---
+
